@@ -1,4 +1,4 @@
-package godkim
+package dkim
 
 import (
     "bytes"
@@ -57,13 +57,13 @@ func NewDKIMPublicKey(txt string) (*DKIMPublicKey, error) {
     }
     return &dkim_pk, nil
 }
-func (dkim *DKIM) GetPublicKey() (*DKIMPublicKey, error) {
-    var domain string = dkim.Header.Selector + "._domainkey." + dkim.Header.Domain + "."
+func (Dkim *DKIM) GetPublicKey() (*DKIMPublicKey, error) {
+    var domain string = Dkim.Header.Selector + "._domainkey." + Dkim.Header.Domain + "."
     var err error
     var text_public_key string
 
-    if dkim.PublicKey != nil {
-        return dkim.PublicKey, nil
+    if Dkim.PublicKey != nil {
+        return Dkim.PublicKey, nil
     }
     text_public_key, err = CustomHandlers.CacheGetHandler(domain)
 
@@ -81,24 +81,24 @@ func (dkim *DKIM) GetPublicKey() (*DKIMPublicKey, error) {
     return nil, errors.New("no public key found")
 }
 
-func (dkim *DKIM) Verify() bool {
+func (Dkim *DKIM) Verify() bool {
     var err error
     var pk interface{}
 
-    if dkim.Header.Domain != "" {
-        dkim.Status.ValidBody = bytes.Equal(dkim.GetBodyHash(), dkim.Header.BodyHash)
-        glog.Infof("dkim.BodyHash %#v\n", dkim.BodyHash)
-        glog.Infof("dkim.Header.BodyHash %#v\n", dkim.Header.BodyHash)
-        if dkim.PublicKey, err = dkim.GetPublicKey(); err == nil {
-            dkim.Status.HasPublicKey = true
+    if Dkim.Header.Domain != "" {
+        Dkim.Status.ValidBody = bytes.Equal(Dkim.GetBodyHash(), Dkim.Header.BodyHash)
+        glog.Infof("Calculated BodyHash %#v\n", Dkim.BodyHash)
+        glog.Infof("Message    BodyHash %#v\n", Dkim.Header.BodyHash)
+        if Dkim.PublicKey, err = Dkim.GetPublicKey(); err == nil {
+            Dkim.Status.HasPublicKey = true
 
-            if pk, err = x509.ParsePKIXPublicKey(dkim.PublicKey.PublicKey); err == nil {
-                if err = rsa.VerifyPKCS1v15(pk.(*rsa.PublicKey), dkim.GetHasher(), dkim.GetHeaderHash(), dkim.Header.Signature); err == nil {
-                    dkim.Status.Valid = true
+            if pk, err = x509.ParsePKIXPublicKey(Dkim.PublicKey.PublicKey); err == nil {
+                if err = rsa.VerifyPKCS1v15(pk.(*rsa.PublicKey), Dkim.GetHasher(), Dkim.GetHeaderHash(), Dkim.Header.Signature); err == nil {
+                    Dkim.Status.Valid = true
                 }
             }
         }
     }
-    glog.Infof("Body: %v, Valid: %v, PK: %v\n", dkim.Status.ValidBody, dkim.Status.Valid, dkim.Status.HasPublicKey)
-    return dkim.Status.ValidBody && dkim.Status.Valid && dkim.Status.HasPublicKey
+    glog.Infof("Body: %v, Valid: %v, PK: %v\n", Dkim.Status.ValidBody, Dkim.Status.Valid, Dkim.Status.HasPublicKey)
+    return Dkim.Status.ValidBody && Dkim.Status.Valid && Dkim.Status.HasPublicKey
 }

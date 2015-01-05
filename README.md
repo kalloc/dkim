@@ -18,7 +18,7 @@ import (
     "bufio"
     "flag"
     "fmt"
-    dkim "github.com/kalloc/godkim"
+    "github.com/kalloc/dkim"
     "os"
 )
 

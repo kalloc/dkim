@@ -1,4 +1,4 @@
-package godkim
+package dkim
 
 import (
     "bufio"
@@ -7,7 +7,7 @@ import (
 )
 
 func ParseEml(r *bufio.Reader) *DKIM {
-    var dkim *DKIM
+    var Dkim *DKIM
     var msg *mail.Message
     var raw_headers mail.Header
     var err error
@@ -23,9 +23,9 @@ func ParseEml(r *bufio.Reader) *DKIM {
         return nil
     }
 
-    if dkim, err = NewDKIM(msg); err != nil {
+    if Dkim, err = NewDKIM(msg); err != nil {
         panic(err)
     }
-    dkim.RawMailHeader = raw_headers
-    return dkim
+    Dkim.RawMailHeader = raw_headers
+    return Dkim
 }

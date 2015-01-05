@@ -1,4 +1,4 @@
-package godkim
+package dkim
 
 import (
     "hash"
