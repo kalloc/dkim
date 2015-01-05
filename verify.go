@@ -6,7 +6,6 @@ import (
     "crypto/x509"
     "encoding/base64"
     "errors"
-    "fmt"
     "github.com/golang/glog"
     "strings"
 )
@@ -48,8 +47,8 @@ func NewDKIMPublicKey(txt string) (*DKIMPublicKey, error) {
                 return nil, errors.New("invalid public")
             }
             break
-        default:
-            return nil, errors.New(fmt.Sprintf("unknown key %s", key))
+            // default:
+            //     return nil, errors.New(fmt.Sprintf("unknown key %s", key))
         }
     }
     if dkim_pk.PublicKey == nil {
@@ -61,6 +60,7 @@ func (Dkim *DKIM) GetPublicKey() (*DKIMPublicKey, error) {
     var domain string = Dkim.Header.Selector + "._domainkey." + Dkim.Header.Domain + "."
     var err error
     var text_public_key string
+    var dkim_pk *DKIMPublicKey
 
     if Dkim.PublicKey != nil {
         return Dkim.PublicKey, nil
@@ -76,7 +76,11 @@ func (Dkim *DKIM) GetPublicKey() (*DKIMPublicKey, error) {
         glog.Infof("CACHE HIT: %s -> %s\n", domain, text_public_key)
     }
     if err == nil {
-        return NewDKIMPublicKey(text_public_key)
+        if dkim_pk, err = NewDKIMPublicKey(text_public_key); err != nil {
+            return nil, err
+        }
+        Dkim.Status.HasPublicKey = true
+        return dkim_pk, nil
     }
     return nil, errors.New("no public key found")
 }
@@ -90,7 +94,6 @@ func (Dkim *DKIM) Verify() bool {
         glog.Infof("Calculated BodyHash %#v\n", Dkim.BodyHash)
         glog.Infof("Message    BodyHash %#v\n", Dkim.Header.BodyHash)
         if Dkim.PublicKey, err = Dkim.GetPublicKey(); err == nil {
-            Dkim.Status.HasPublicKey = true
 
             if pk, err = x509.ParsePKIXPublicKey(Dkim.PublicKey.PublicKey); err == nil {
                 if err = rsa.VerifyPKCS1v15(pk.(*rsa.PublicKey), Dkim.GetHasher(), Dkim.GetHeaderHash(), Dkim.Header.Signature); err == nil {
