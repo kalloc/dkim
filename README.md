@@ -16,7 +16,6 @@ We support custom resolving and custom cache logic.
 - Support ExpireTime
 - Support Copied header fields (z=)
 - Sign
-- In memory cache handler (as default)
 
 ## How to use it?
 ```

@@ -2,25 +2,21 @@ package dkim
 
 import (
     "errors"
-    "github.com/bradfitz/gomemcache/memcache"
     "github.com/miekg/dns"
     "strings"
 )
 
-func cacheGetHandler(key string) (string, error) {
-    var err error
-    var mc *memcache.Client
-    var item *memcache.Item
-    mc = memcache.New("127.0.0.1:11211")
+var localCache map[string][]byte
 
-    if item, err = mc.Get(key); err == nil {
-        return string(item.Value), nil
+func LocalCacheGetHandler(key string) (string, error) {
+    var value []byte = localCache[key]
+    if value == nil {
+        return "", errors.New("Not found")
     }
-    return "", err
+    return string(value), nil
 }
-func cacheSetHandler(key string, value []byte) {
-    mc := memcache.New("127.0.0.1:11211")
-    mc.Set(&memcache.Item{Key: key, Value: value})
+func LocalCacheSetHandler(key string, value []byte) {
+    localCache[key] = value
 }
 
 func dnsFetchHandler(domain string) (string, error) {
@@ -50,7 +46,10 @@ var CustomHandlers struct {
 }
 
 func init() {
-    CustomHandlers.CacheGetHandler = cacheGetHandler
-    CustomHandlers.CacheSetHandler = cacheSetHandler
+    localCache = make(map[string][]byte, 0)
+    if CustomHandlers.CacheGetHandler == nil {
+        CustomHandlers.CacheGetHandler = LocalCacheGetHandler
+        CustomHandlers.CacheSetHandler = LocalCacheSetHandler
+    }
     CustomHandlers.DnsFetchHandler = dnsFetchHandler
 }
