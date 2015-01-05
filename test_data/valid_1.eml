@@ -1,0 +1,53 @@
+Delivered-To: martianvirgins@gmail.com
+Received: by 10.194.108.42 with SMTP id hh10csp2692387wjb;
+        Sun, 4 Jan 2015 11:55:48 -0800 (PST)
+X-Received: by 10.194.91.145 with SMTP id ce17mr89654424wjb.132.1420401347756;
+        Sun, 04 Jan 2015 11:55:47 -0800 (PST)
+Return-Path: <me+caf_=martianvirgins=gmail.com@n1ck.name>
+Received: from mail-we0-f174.google.com (mail-we0-f174.google.com. [74.125.82.174])
+        by mx.google.com with ESMTPS id de1si107744922wjc.85.2015.01.04.11.55.46
+        for <martianvirgins@gmail.com>
+        (version=TLSv1 cipher=ECDHE-RSA-RC4-SHA bits=128/128);
+        Sun, 04 Jan 2015 11:55:46 -0800 (PST)
+Received-SPF: softfail (google.com: domain of transitioning me+caf_=martianvirgins=gmail.com@n1ck.name does not designate 74.125.82.174 as permitted sender) client-ip=74.125.82.174;
+Authentication-Results: mx.google.com;
+       spf=softfail (google.com: domain of transitioning me+caf_=martianvirgins=gmail.com@n1ck.name does not designate 74.125.82.174 as permitted sender) smtp.mail=me+caf_=martianvirgins=gmail.com@n1ck.name
+Received: by mail-we0-f174.google.com with SMTP id k48so6807807wev.19
+        for <martianvirgins@gmail.com>; Sun, 04 Jan 2015 11:55:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20130820;
+        h=x-original-authentication-results:x-gm-message-state:delivered-to
+         :to:subject:message-id:date:from;
+        bh=g3zLYH4xKxcPrHOD18z9YfpQcnk/GaJedfustWU5uGs=;
+        b=HDpXHsYutafypL6GX97xyVUT6bZsJvUUVTXTpz9CIUL/2KVELC5KNK+pYDY57zPZ8P
+         95Ms7jDJcKnnJNX1ADuL/htzfZwXpfyxOagm9ERn47sh1UppEkweIs2x1wNOQFriCzY1
+         uoM8D4QEk54Vk4S4+MCb28uRuLOFC3IR9cPlxLOdpMf4vMGMRCljXMpVMgQugV9ozudi
+         y9iDsiEq9VhA1Aduu7I5QZZjn7hqXRQXIm5AEOuXlGEji0kPEaxisFavF8KbyUfez/Uv
+         6iuaaQce+VG+4a5777sVo+s+TQ5praDMFr0MRiRVZvddSMI3ex3Wa/LjNrVQkyMucBwh
+         lXcw==
+X-Original-Authentication-Results: mx.google.com;       spf=none (google.com: y@y.local does not designate permitted sender hosts) smtp.mail=y@y.local
+X-Gm-Message-State: ALoCoQmw+aMzqLzQtzOuvSykOY1g4F3BnuLJteMqyN0WFGuhbOYRFHTVj5fNAjHxuTrXIwtP1Osz
+X-Received: by 10.194.86.165 with SMTP id q5mr173883783wjz.10.1420401345967;
+        Sun, 04 Jan 2015 11:55:45 -0800 (PST)
+X-Forwarded-To: martianvirgins@gmail.com
+X-Forwarded-For: me@n1ck.name martianvirgins@gmail.com
+Delivered-To: me@n1ck.name
+Received: by 10.194.25.200 with SMTP id e8csp4473252wjg;
+        Sun, 4 Jan 2015 11:55:45 -0800 (PST)
+X-Received: by 10.112.24.130 with SMTP id u2mr87394753lbf.57.1420401344473;
+        Sun, 04 Jan 2015 11:55:44 -0800 (PST)
+Return-Path: <y@y.local>
+Received: from y.local (h86-62-83-99.ln.rinet.ru. [86.62.83.99])
+        by mx.google.com with ESMTP id la5si59534721lac.64.2015.01.04.11.55.43
+        for <me@n1ck.name>;
+        Sun, 04 Jan 2015 11:55:44 -0800 (PST)
+Received-SPF: none (google.com: y@y.local does not designate permitted sender hosts) client-ip=86.62.83.99;
+Received: by y.local (Postfix, from userid 501)
+	id 2F0F12623F04; Sun,  4 Jan 2015 22:55:41 +0300 (MSK)
+To: me@n1ck.name
+Subject: test
+Message-Id: <20150104195542.2F0F12623F04@y.local>
+Date: Sun,  4 Jan 2015 22:55:41 +0300 (MSK)
+From: y@y.local (y)
+
+test
