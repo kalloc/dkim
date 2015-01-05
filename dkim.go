@@ -275,6 +275,10 @@ func (Dkim *DKIM) GetHeaderHash() []byte {
             header_key = key
         }
         header_values = header[textproto.CanonicalMIMEHeaderKey(key)]
+        // Skip header
+        if len(header_values) == 0 {
+            continue
+        }
         header_value = header_values[len(header_values)-1]
         hasher.Write([]byte(header_key + ":"))
         hasher.Write(Dkim.CanonizeHeader([]byte(header_value)))
