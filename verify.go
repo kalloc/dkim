@@ -59,24 +59,24 @@ func NewDKIMPublicKey(txt string) (*DKIMPublicKey, error) {
 func (Dkim *DKIM) GetPublicKey() (*DKIMPublicKey, error) {
     var domain string = Dkim.Header.Selector + "._domainkey." + Dkim.Header.Domain + "."
     var err error
-    var text_public_key string
+    var public_key []byte
     var dkim_pk *DKIMPublicKey
 
     if Dkim.PublicKey != nil {
         return Dkim.PublicKey, nil
     }
-    text_public_key, err = CustomHandlers.CacheGetHandler(domain)
+    public_key, err = CustomHandlers.CacheGetHandler(domain)
 
     if err != nil {
         glog.Infof("CACHE MISS: %s (%s)\n", domain, err)
-        if text_public_key, err = CustomHandlers.DnsFetchHandler(domain); err == nil {
-            CustomHandlers.CacheSetHandler(domain, []byte(text_public_key))
+        if public_key, err = CustomHandlers.DnsFetchHandler(domain); err == nil {
+            CustomHandlers.CacheSetHandler(domain, public_key)
         }
     } else {
-        glog.Infof("CACHE HIT: %s -> %s\n", domain, text_public_key)
+        glog.Infof("CACHE HIT: %s -> %s\n", domain, public_key)
     }
     if err == nil {
-        if dkim_pk, err = NewDKIMPublicKey(text_public_key); err != nil {
+        if dkim_pk, err = NewDKIMPublicKey(string(public_key)); err != nil {
             return nil, err
         }
         Dkim.Status.HasPublicKey = true
