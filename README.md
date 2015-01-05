@@ -10,6 +10,14 @@ We can very fast verifying DKIM headers.
 It is about 44mb per second on my laptop.
 We support custom resolving and custom cache logic. 
 
+## TODO
+- Support Length tag
+- Support Time
+- Support ExpireTime
+- Support Copied header fields (z=)
+- Sign
+- In memory cache handler (as default)
+
 ## How to use it?
 ```
 package main
