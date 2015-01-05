@@ -19,6 +19,9 @@ func MemCacheGetHandler(key string) (string, error) {
     return "", err
 }
 func MemCacheSetHandler(key string, value []byte) {
+    if len(value) == 0 {
+        return
+    }
     mc := memcache.New("127.0.0.1:11211")
     mc.Set(&memcache.Item{Key: key, Value: value})
 }

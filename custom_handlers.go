@@ -16,6 +16,9 @@ func LocalCacheGetHandler(key string) (string, error) {
     return string(value), nil
 }
 func LocalCacheSetHandler(key string, value []byte) {
+    if len(value) == 0 {
+        return
+    }
     localCache[key] = value
 }
 
