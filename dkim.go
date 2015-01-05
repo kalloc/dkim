@@ -294,7 +294,7 @@ func (Dkim *DKIM) GetHeaderHash() []byte {
 }
 
 func (Dkim *DKIM) readBodyTo(w io.Writer) {
-    var line, prev_line []byte
+    var line, prev_line, tmp []byte
     var r *bufio.Reader = bufio.NewReader(Dkim.Mail.Body)
     var err error
 
@@ -304,24 +304,39 @@ func (Dkim *DKIM) readBodyTo(w io.Writer) {
             break
         }
         if len(prev_line) > 0 {
-            w.Write(prev_line)
-        }
-        if len(line) > 2 && Dkim.IsBodyRelaxed {
-            line = bytes.TrimRight(line, "\t\r\n ") // remove WSP on the right side and trunk \r\n
-            if len(line) > 0 {
-                line = bytes.Replace(line, []byte("\t"), []byte(" "), -1)          // replace all \t to \s
-                line = regexp.MustCompile(`[ ]{2,}`).ReplaceAll(line, []byte(" ")) // replace double \s to one
-                if line[0] == ' ' {                                                // if the first symbol is \s, may be next too, replace all \s to one
-                    line = append([]byte(" "), bytes.TrimLeft(line, " ")...)
-                }
+            if len(tmp) > 0 {
+                w.Write(tmp)
+                tmp = nil
             }
-            prev_line = append(line, '\r', '\n')
+            w.Write(prev_line)
+            prev_line = nil
+        }
+        if Dkim.IsBodyRelaxed {
+            if len(line) > 2 {
+                line = bytes.TrimRight(line, "\t\r\n ") // remove WSP on the right side and trunk \r\n
+                if len(line) > 0 {
+                    line = bytes.Replace(line, []byte("\t"), []byte(" "), -1)          // replace all \t to \s
+                    line = regexp.MustCompile(`[ ]{2,}`).ReplaceAll(line, []byte(" ")) // replace double \s to one
+                    if line[0] == ' ' {                                                // if the first symbol is \s, may be next too, replace all \s to one
+                        line = append([]byte(" "), bytes.TrimLeft(line, " ")...)
+                    }
+                }
+                line = append(line, '\r', '\n')
+            }
+            if len(line) > 2 {
+                prev_line = line
+            } else {
+                tmp = append(tmp, '\r', '\n')
+            }
         } else {
             prev_line = line
         }
     }
     if len(prev_line) > 0 {
         if !bytes.Equal(prev_line, []byte("\r\n")) {
+            if len(tmp) > 0 {
+                w.Write(tmp)
+            }
             w.Write(prev_line)
         }
     }

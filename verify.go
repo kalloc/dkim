@@ -68,8 +68,8 @@ func (Dkim *DKIM) GetPublicKey() (*DKIMPublicKey, error) {
     text_public_key, err = CustomHandlers.CacheGetHandler(domain)
 
     if err != nil {
-        glog.Infof("CACHE MISS: %s\n", domain)
-        if text_public_key, err = CustomHandlers.DnsFetchHandler(domain); err != nil {
+        glog.Infof("CACHE MISS: %s (%s)\n", domain, err)
+        if text_public_key, err = CustomHandlers.DnsFetchHandler(domain); err == nil {
             CustomHandlers.CacheSetHandler(domain, []byte(text_public_key))
         }
     } else {
