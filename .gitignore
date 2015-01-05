@@ -1,0 +1,6 @@
+*swp
+_vendor
+*.prof
+reports/*
+.DS_Store
+.idea
