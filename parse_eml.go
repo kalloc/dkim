@@ -2,11 +2,11 @@ package dkim
 
 import (
     "bufio"
-    "fmt"
+    "errors"
     "net/mail"
 )
 
-func ParseEml(r *bufio.Reader) *DKIM {
+func ParseEml(r *bufio.Reader) (*DKIM, error) {
     var Dkim *DKIM
     var msg *mail.Message
     var raw_headers mail.Header
@@ -15,17 +15,16 @@ func ParseEml(r *bufio.Reader) *DKIM {
     raw_headers, r = GetRawHeaders(r)
 
     if msg, err = mail.ReadMessage(r); err != nil {
-        fmt.Printf("%#v\n", err)
-        return nil
+        return nil, err
     }
 
     if msg.Header.Get("DKIM-Signature") == "" {
-        return nil
+        return nil, errors.New("DKIM-Signature not found")
     }
 
     if Dkim, err = NewDKIM(msg); err != nil {
-        panic(err)
+        return nil, err
     }
     Dkim.RawMailHeader = raw_headers
-    return Dkim
+    return Dkim, nil
 }
