@@ -18,11 +18,12 @@ import (
     "strings"
 )
 
-func NewDKIM(msg *mail.Message) (*DKIM, error) {
+func NewDKIM(header string, msg *mail.Message) (*DKIM, error) {
     var err error
     var Dkim *DKIM = &DKIM{
-        Mail:   msg,
-        Header: &DKIMHeader{Version: "1"},
+        Mail:       msg,
+        HeaderName: header,
+        Header:     &DKIMHeader{Version: "1"},
     }
     if err = Dkim.ParseDKIM(); err != nil {
         return nil, err
@@ -99,8 +100,9 @@ func (Dkim *DKIMHeader) String() string {
 func (Dkim *DKIM) ParseDKIM() (err error) {
     var prev_key, key, value, item string
     var kvs []string
-    var header string = Dkim.Mail.Header.Get("DKIM-Signature")
+    var header string
 
+    header = Dkim.Mail.Header.Get(Dkim.HeaderName)
     for _, item = range strings.Split(strings.Replace(header, " ", "", -1), ";") {
         kvs = strings.SplitN(item, "=", 2)
         if len(kvs) != 2 {
@@ -197,7 +199,7 @@ func (Dkim *DKIM) DKIMSignatureForHash() []byte {
         header = Dkim.RawMailHeader
     }
 
-    return rx.ReplaceAll([]byte(header.Get("DKIM-Signature")), []byte("b="))
+    return rx.ReplaceAll([]byte(header.Get(Dkim.HeaderName)), []byte("b="))
 }
 
 func (Dkim *DKIM) CanonizeHeader(body []byte) []byte {
@@ -216,6 +218,18 @@ func (Dkim *DKIM) CanonizeHeader(body []byte) []byte {
     }
     return body
 
+}
+
+func FindDkimHeader(mail_header mail.Header) (string, error) {
+    var headers []string = []string{"DKIM-Signature", "X-Google-DKIM-Signature"}
+    var header string
+
+    for _, header = range headers {
+        if mail_header.Get(header) != "" {
+            return header, nil
+        }
+    }
+    return "", errors.New("not found")
 }
 
 func GetRawHeaders(r *bufio.Reader) (mail.Header, *bufio.Reader) {

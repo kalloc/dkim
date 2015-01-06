@@ -6,13 +6,15 @@ import (
 )
 
 type DKIM struct {
-    Header          *DKIMHeader
-    RawMailHeader   mail.Header
-    Hasher          *hash.Hash
-    Mail            *mail.Message
-    IsBodyRelaxed   bool
-    IsHeaderRelaxed bool
-    Status          struct {
+    Header            *DKIMHeader
+    HeaderName        string
+    HeaderNameForHash string
+    RawMailHeader     mail.Header
+    Hasher            *hash.Hash
+    Mail              *mail.Message
+    IsBodyRelaxed     bool
+    IsHeaderRelaxed   bool
+    Status            struct {
         HasPublicKey bool
         ValidBody    bool
         Valid        bool
