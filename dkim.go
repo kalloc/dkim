@@ -25,7 +25,7 @@ func NewDKIM(header string, msg *mail.Message) (*DKIM, error) {
 		HeaderName: header,
 		Header:     &DKIMHeader{Version: "1"},
 	}
-	if err = Dkim.ParseDKIM(); err != nil {
+	if err = Dkim.parseDKIM(); err != nil {
 		return nil, err
 	}
 	return Dkim, nil
@@ -97,7 +97,7 @@ func (Dkim *DKIMHeader) String() string {
 	return strings.Join(items, "; ")
 }
 
-func (Dkim *DKIM) ParseDKIM() (err error) {
+func (Dkim *DKIM) parseDKIM() (err error) {
 	var prev_key, key, value, item string
 	var kvs []string
 	var header string
@@ -189,7 +189,7 @@ func (Dkim *DKIM) ParseDKIM() (err error) {
 	return
 }
 
-func (Dkim *DKIM) DKIMSignatureForHash() []byte {
+func (Dkim *DKIM) dkimSignatureForHash() []byte {
 	var header mail.Header
 	var rx *regexp.Regexp = regexp.MustCompile(`b=[^;]+`)
 
@@ -202,7 +202,7 @@ func (Dkim *DKIM) DKIMSignatureForHash() []byte {
 	return rx.ReplaceAll([]byte(header.Get(Dkim.HeaderName)), []byte("b="))
 }
 
-func (Dkim *DKIM) CanonizeHeader(body []byte) []byte {
+func (Dkim *DKIM) canonizeHeader(body []byte) []byte {
 	if Dkim.IsHeaderRelaxed {
 		if len(body) == 0 {
 			return nil
@@ -220,7 +220,7 @@ func (Dkim *DKIM) CanonizeHeader(body []byte) []byte {
 
 }
 
-func FindDkimHeader(mail_header mail.Header) (string, error) {
+func findDkimHeader(mail_header mail.Header) (string, error) {
 	var headers []string = []string{"DKIM-Signature", "X-Google-DKIM-Signature"}
 	var header string
 
@@ -232,7 +232,7 @@ func FindDkimHeader(mail_header mail.Header) (string, error) {
 	return "", errors.New("not found")
 }
 
-func GetRawHeaders(r *bufio.Reader) (mail.Header, *bufio.Reader) {
+func getRawHeaders(r *bufio.Reader) (mail.Header, *bufio.Reader) {
 	var headers mail.Header = make(map[string][]string, 0)
 
 	var key, value, line string
@@ -274,7 +274,12 @@ func (Dkim *DKIM) GetHeaderHash() []byte {
 	var dkim_sig_key string
 	var header mail.Header
 
+	if Dkim.headerHash != nil {
+		return Dkim.headerHash
+	}
+
 	if Dkim.IsHeaderRelaxed {
+
 		dkim_sig_key = "dkim-signature"
 		header = Dkim.Mail.Header
 	} else {
@@ -295,16 +300,17 @@ func (Dkim *DKIM) GetHeaderHash() []byte {
 		}
 		header_value = header_values[len(header_values)-1]
 		hasher.Write([]byte(header_key + ":"))
-		hasher.Write(Dkim.CanonizeHeader([]byte(header_value)))
+		hasher.Write(Dkim.canonizeHeader([]byte(header_value)))
 		if Dkim.IsHeaderRelaxed {
 			hasher.Write([]byte("\r\n"))
 		}
-		glog.Infof("%s:%s\r\n", header_key, Dkim.CanonizeHeader([]byte(header_value)))
+		glog.Infof("%s:%s\r\n", header_key, Dkim.canonizeHeader([]byte(header_value)))
 	}
 	hasher.Write([]byte(dkim_sig_key + ":"))
-	hasher.Write(Dkim.CanonizeHeader(Dkim.DKIMSignatureForHash()))
-	glog.Infof("%s:%s\n", dkim_sig_key, Dkim.CanonizeHeader(Dkim.DKIMSignatureForHash()))
-	return hasher.Sum(nil)
+	hasher.Write(Dkim.canonizeHeader(Dkim.dkimSignatureForHash()))
+	glog.Infof("%s:%s\n", dkim_sig_key, Dkim.canonizeHeader(Dkim.dkimSignatureForHash()))
+	Dkim.headerHash = hasher.Sum(nil)
+	return Dkim.headerHash
 }
 
 func (Dkim *DKIM) readBodyTo(w io.Writer) {
@@ -357,8 +363,8 @@ func (Dkim *DKIM) readBodyTo(w io.Writer) {
 }
 
 func (Dkim *DKIM) GetBodyHash() []byte {
-	if Dkim.BodyHash != nil {
-		return Dkim.BodyHash
+	if Dkim.bodyHash != nil {
+		return Dkim.bodyHash
 	}
 	var hasher hash.Hash = Dkim.GetHasher().New()
 
@@ -369,6 +375,6 @@ func (Dkim *DKIM) GetBodyHash() []byte {
 
 	Dkim.readBodyTo(hasher)
 
-	Dkim.BodyHash = hasher.Sum(nil)
-	return Dkim.BodyHash
+	Dkim.bodyHash = hasher.Sum(nil)
+	return Dkim.bodyHash
 }

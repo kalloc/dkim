@@ -13,13 +13,13 @@ func ParseEml(r *bufio.Reader) (*DKIM, error) {
 	var err error
 	var header string
 
-	raw_headers, r = GetRawHeaders(r)
+	raw_headers, r = getRawHeaders(r)
 
 	if msg, err = mail.ReadMessage(r); err != nil {
 		return nil, err
 	}
 
-	if header, err = FindDkimHeader(raw_headers); err != nil {
+	if header, err = findDkimHeader(raw_headers); err != nil {
 		return nil, errors.New("DKIM-Signature not found")
 	}
 

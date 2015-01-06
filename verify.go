@@ -17,7 +17,7 @@ type DKIMPublicKey struct {
 	PublicKey []byte `dkim_pk:"p", json:"public_key"`
 }
 
-func NewDKIMPublicKey(txt string) (*DKIMPublicKey, error) {
+func newDKIMPublicKey(txt string) (*DKIMPublicKey, error) {
 	var key, value, item string
 	var kvs []string
 	var err error
@@ -76,7 +76,7 @@ func (Dkim *DKIM) GetPublicKey() (*DKIMPublicKey, error) {
 		glog.Infof("CACHE HIT: %s -> %s\n", domain, public_key)
 	}
 	if err == nil {
-		if dkim_pk, err = NewDKIMPublicKey(string(public_key)); err != nil {
+		if dkim_pk, err = newDKIMPublicKey(string(public_key)); err != nil {
 			return nil, err
 		}
 		Dkim.Status.HasPublicKey = true
@@ -91,7 +91,7 @@ func (Dkim *DKIM) Verify() bool {
 
 	if Dkim.Header.Domain != "" {
 		Dkim.Status.ValidBody = bytes.Equal(Dkim.GetBodyHash(), Dkim.Header.BodyHash)
-		glog.Infof("Calculated BodyHash %#v\n", Dkim.BodyHash)
+		glog.Infof("Calculated BodyHash %#v\n", Dkim.bodyHash)
 		glog.Infof("Message    BodyHash %#v\n", Dkim.Header.BodyHash)
 		if Dkim.PublicKey, err = Dkim.GetPublicKey(); err == nil {
 

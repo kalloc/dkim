@@ -19,8 +19,9 @@ type DKIM struct {
 		ValidBody    bool
 		Valid        bool
 	}
-	PublicKey *DKIMPublicKey
-	BodyHash  []byte
+	PublicKey  *DKIMPublicKey
+	headerHash []byte
+	bodyHash   []byte
 }
 
 type DKIMHeader struct {
