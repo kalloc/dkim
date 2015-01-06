@@ -1,12 +1,12 @@
 # Yet Another DKIM Verifier
 
 ## Why not?
-I found some DKIM solution for go, but I don’t like untested C binding and I have some times (thank you mr.Putin)
+I found some DKIM solution for go, but I don’t like untested C binding and I have some time (thank you mr.Putin)
 I wrote this code for my pet project.
 
-## What we can?
+## What can we do?
 
-We can very fast verifying DKIM headers.
+We can verify DKIM headers very fast.
 It is about 44mb per second on my laptop.
 We support custom resolving and custom cache logic. 
 
