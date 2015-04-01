@@ -252,12 +252,15 @@ func getRawHeaders(r *bufio.Reader) (mail.Header, *bufio.Reader) {
 
 		if line[0] != ' ' && line[0] != '\t' {
 			kv = strings.SplitN(line, ":", 2)
-			key = textproto.CanonicalMIMEHeaderKey(kv[0])
-			value = kv[1]
-			if headers[key] == nil {
-				headers[key] = make([]string, 0)
+			// skip invalid header
+			if len(kv) == 2 {
+				key = textproto.CanonicalMIMEHeaderKey(kv[0])
+				value = kv[1]
+				if headers[key] == nil {
+					headers[key] = make([]string, 0)
+				}
+				headers[key] = append(headers[key], value)
 			}
-			headers[key] = append(headers[key], value)
 		} else {
 			headers[key][len(headers[key])-1] += line
 		}
